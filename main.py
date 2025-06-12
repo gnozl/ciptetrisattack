@@ -8,7 +8,9 @@ canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 GRID_SIZE = 50
 COLUMNS = 6
 ROWS = 12
-COLORS = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
+#COLORS = ('red', 'orange', 'yellow', 'green', 'blue', 'purple')
+AZTEC = ('red.png', 'orange.png', 'green.png', 'blue.png', 'yellow.png', 'purple.png')
+ALL_COLORS = ('red.png', 'orange.png', 'green.png', 'blue.png', 'yellow.png', 'purple.png', 'pink.png', 'grey.png', 'white.png')
 MOVE_KEYS = ('ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'w', 'a', 's', 'd')
 START_TIME = 300
 EMPTY_SQUARE = {'id' : '', 'color' : '',  'state' : 'empty'}
@@ -181,7 +183,9 @@ def update_whitelist(grid, white_list, death_list):
         x,y = find_xy(square)
         grid[x][y]['color'] = 'white'
         grid[x][y]['state'] = 'dead'
-        canvas.set_color(square, 'white')
+        canvas.delete(square)
+        square = create_tile(x,y, 'white.png')
+        #canvas.set_color(square, 'white')
         death_list.append(square)
 
 def delete_update(grid,death_list,drop_list):
@@ -339,7 +343,7 @@ def player_create(x ,y):
     return canvas.create_image(
         x * GRID_SIZE,
         CANVAS_HEIGHT-GRID_SIZE-(y*GRID_SIZE),
-        'swaparrow.png'
+        'select.png'
     )
     # return canvas.create_rectangle(
     #     x * GRID_SIZE,
@@ -385,20 +389,31 @@ def initial_fill(grid):
             if row >= 1:
                 below = grid[column][row-1]['color']
             while color == below or color == left:
-                color = random.choice(COLORS)
-            temp = create_square(column, row, color)
+                color = random.choice(AZTEC)
+                #color = random.choice(COLORS)
+            #temp = create_square(column, row, color)
+            temp = create_tile(column, row, color)
             grid[column][row] = {'id' : temp, 'color' : color, 'state' : 'alive'}
 
             time.sleep(.01)
 
-def create_square(column, row, color):
-    return canvas.create_rectangle(
+# def create_square(column, row, color):
+#     return canvas.create_rectangle(
+#         (column)*GRID_SIZE,
+#         (11-row)*GRID_SIZE,
+#         (column+1)*GRID_SIZE,
+#         (12-row)*GRID_SIZE,
+#         color,
+#         'black'
+#     )
+
+def create_tile(column, row, color):
+    return canvas.create_image_with_size(
         (column)*GRID_SIZE,
         (11-row)*GRID_SIZE,
-        (column+1)*GRID_SIZE,
-        (12-row)*GRID_SIZE,
-        color,
-        'black'
+        50,
+        50,
+        color
     )
 
 def update_time(timer,clock,drop_list):
@@ -417,36 +432,65 @@ def update_time(timer,clock,drop_list):
         timer['combo'] -= 1
 
 def start_screen():
-    start_text = canvas.create_text(
-        50,
+    canvas.create_text(
+        125,
         100,
         'TETRIS ATTACK',
         font_size = 25,
         color = 'white'
     )
-    start_text2 = canvas.create_text(
-        50,
-        200,
-        'Press J or Enter to SWAP',
-        font_size = 25,
+    canvas.create_text(
+        125,
+        150,
+        'By Gerardo Gonzalez',
+        font_size = 20,
         color = 'white'
     )
 
-    start_text3 = canvas.create_text(
-        50,
+    canvas.create_text(
+        125,
+        250,
+        'WASD or Arrow Keys to move',
+        font_size = 20,
+        color = 'white'
+    )
+
+    canvas.create_text(
+        125,
         300,
-        'Arrow Keys or WASD to move',
-        font_size = 25,
+        'Press Enter to swap tiles',
+        font_size = 20,
+        color = 'white'
+    )
+
+    canvas.create_text(
+        125,
+        350,
+        'Match tiles to score points',
+        font_size = 20,
+        color = 'white'
+    )
+
+    canvas.create_text(
+        125,
+        400,
+        "Don't let tiles reach the top!",
+        font_size = 20,
         color = 'white'
     )
 
     start_text4 = canvas.create_text(
-        50,
-        400,
-        'Match colors to score points',
-        font_size = 25,
+        125,
+        500,
+        'Press any key to continue',
+        font_size = 20,
         color = 'white'
     )
+
+    for y in range(12):
+        for x in (0,1,10,11):
+            color = random.choice(ALL_COLORS)
+            create_tile(x,y,color)
     
     while not canvas.get_new_key_presses():
         pass
@@ -560,8 +604,11 @@ def bottom_fill(grid):
         above = grid[i][1]['color']
         left = color
         while color == left or color == above:
-            color = random.choice(COLORS)
-        temp = create_square(i, 0, color)
+            #color = random.choice(COLORS)
+            color = random.choice(AZTEC)
+        #temp = create_square(i, 0, color)
+        temp = create_tile(i, 0, color)
+        
         grid[i][0] = {'id' : temp, 'color' : color, 'state' : 'alive'}
 
 def error_check(grid,player):
